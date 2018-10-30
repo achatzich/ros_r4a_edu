@@ -1,3 +1,4 @@
 string[] brd
+bool won
 ---
 int16 move
