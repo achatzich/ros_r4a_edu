@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
+import random
 import rospy
-from complex_communication.srv import *
-from player_class import Player
+import os
+import sys
+from complex_communication_messages.msg import game
+from class_player import Player
 
-def player2():
-	rospy.init_node('player2_server')
-	s=rospy.Service('player2', movement, p2.handle_player)
-	rospy.spin()#just waits for the node to shutdown
+if __name__ == '__main__':
+	player2= Player(2, "O")
+	rospy.init_node('player2', anonymous=True)
+	player2.listener()
+	player2.talker()
 
-if __name__ == "__main__":
-	p2 = Player()
-	player2()

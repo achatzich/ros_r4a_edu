@@ -1,0 +1,5 @@
+<launch>
+	<node name="orchestrator" pkg="complex_communication_messages" type="orchestrator.py" output="screen"/>
+	<node name="player1" pkg="complex_communication_messages" type="player1.py" output="screen"/>
+	<node name="player2" pkg="complex_communication_messages" type="player2.py" output="screen"/>
+</launch>
