@@ -11,8 +11,8 @@ class Board:
  	def __init__(self):
  		self.board = [' '] * 10
  		self.game_on = True
- 		self.pub = 0
- 		self.sub = random.randint(1,2)
+ 		self.pub_node = 0
+ 		self.sub_node = random.randint(1,2)
  		
 	def display_board(self):
 		print('   |   |')
@@ -51,8 +51,8 @@ class Board:
 		pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
 		#rospy.init_node('orchestrator', anonymous=True)
 		msg = game()
-		msg.from_node = self.pub
-		msg.to_node = self.sub
+		msg.from_node = self.pub_node
+		msg.to_node = self.sub_node
 		msg.brd=self.board
 		rospy.loginfo(msg)
 		pub.publish(msg)
@@ -61,22 +61,22 @@ class Board:
 		rospy.loginfo((data.from_node, data.to_node))
 		if data.to_node == 0:
 			self.board = data.brd
-			self.pub = data.from_node
-			self.sub = data.to_node
+			self.pub_node = data.from_node
+			self.sub_node = data.to_node
 			self.end_game()
 				
 	def next_move(self):
 		msg = game()
 		msg.from_node = 0
 		msg.brd=self.board
-		if self.pub == 1:
+		if self.pub_node == 1:
 			msg.to_node = 2
 		else:
 			msg.to_node = 1
 		pub.publish(msg)
 		
 	def end_game(self):
-		if self.pub == 1:
+		if self.pub_node == 1:
 			if self.win_check('X'):
 				self.display_board()
 				print('Player 1 has won the game!')
