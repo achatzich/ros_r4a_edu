@@ -6,13 +6,28 @@ import os
 import sys
 from complex_communication_messages.msg import game
 
-class Board:
 
+class BoardNode(object):
+    def __init__(self, node_name="orchestrator"):
+	theBoard = Board()
+        rospy.init_node('orchestrator', anonymous=True)
+        self.rate = rospy.Rate(10) # 10hz
+        self.rate.sleep()
+	theBoard.start_game()
+
+    def start(self):
+        self.rate.sleep()
+        while not rospy.is_shutdown():
+            self.rate.sleep()
+
+class Board:
  	def __init__(self):
  		self.board = [' '] * 10
  		self.game_on = True
  		self.pub_node = 0
  		self.sub_node = random.randint(1,2)
+		self.pub = rospy.Publisher('/tic_tac_toe', game, queue_size=100)
+                self.sub = rospy.Subscriber('/tic_tac_toe', game, self.callback)
  		
 	def display_board(self):
 		print('   |   |')
@@ -47,39 +62,36 @@ class Board:
 				return False
 		return True
 
-	def talker_beginning(self):
-		self.pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
-		#rospy.init_node('orchestrator', anonymous=True)
-		msg = game()
-		msg.from_node = self.pub_node
-		msg.to_node = self.sub_node
-		msg.brd=self.board
-		rospy.loginfo(msg)
-		print('Player', self.sub_node, ' will go first.')
-		self.display_board()
-		self.pub.publish(msg)
-		print('kfjghdsjfg')
+	def start_game(self):
+            self.msg = game()
+            self.msg.from_node = self.pub_node
+            self.msg.to_node = self.sub_node
+            self.msg.brd=self.board
+            print('Player', self.sub_node, ' will go first.')
+            self.display_board()
+            self.pub.publish(self.msg)
+
 
 	def callback(self,data):
-		rospy.loginfo((data.from_node, data.to_node))
-		if data.to_node == 0:
-			self.board = data.brd
-			self.pub_node = data.from_node
-			self.sub_node = data.to_node
-			self.end_game()
-			if self.game_on:
-				self.diplay_board()
-				self.next_move()
+            rospy.loginfo((data.from_node, data.to_node))
+            if data.to_node == 0:
+                self.board = data.brd
+                self.pub_node = data.from_node
+                self.sub_node = data.to_node
+                self.end_game()
+                if self.game_on:
+                    self.display_board()
+                    self.next_move()
 				
 	def next_move(self):
-		msg = game()
-		msg.from_node = 0
-		msg.brd=self.board
-		if self.pub_node == 1:
-			msg.to_node = 2
-		else:
-			msg.to_node = 1
-		self.pub.publish(msg)
+            msg = game()
+            msg.from_node = 0
+            msg.brd=self.board
+            if self.pub_node == 1:
+                msg.to_node = 2
+            else:
+                msg.to_node = 1
+            self.pub.publish(msg)
 		
 	def end_game(self):
 		if self.pub_node == 1:
@@ -97,17 +109,3 @@ class Board:
 				self.display_board()
 				print('The game is a draw!')
 				self.game_on = False
-			
-
-	def listener(self):
-		#rospy.init_node('orchestrator', anonymous=True)
-		print("e")
-		rospy.Subscriber("tic_tac_toe", game, self.callback)
-		print("ea")
-		# spin() simply keeps python from exiting until this node is stopped
-		rospy.spin()
-		print("eb")
-		
-		
-		
-		

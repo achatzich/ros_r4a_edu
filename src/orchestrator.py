@@ -5,20 +5,10 @@ import rospy
 import os
 import sys
 from complex_communication_messages.msg import game
-from class_board import Board
+from class_board import Board, BoardNode
 
  		  	
 if __name__ == '__main__':
-	
-	theBoard=Board()
-	#pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
-	rospy.init_node('orchestrator', anonymous=True)
-	theBoard.talker_beginning()
-	print('dsfdsfg')
-	theBoard.listener()
-	print("esa")
-	if theBoard.game_on == False:
-		rospy.is_shutdown()
-		sys.exit(0)
+    brdNode = BoardNode("TicTacToeOrchestrator")
+    brdNode.start()
 
-	

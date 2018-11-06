@@ -11,18 +11,18 @@ class Player:
 	def __init__(self, player_id, marker):
 		self.player_id = player_id
 		self.marker = marker
+		self.pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
+		self.sub = rospy.Subscriber("tic_tac_toe", game, self.callback)
 		
 	def talker(self, board):
-		pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
-#rospy.init_node('player', anonymous=True)
 		msg = game()
 		msg.from_node = self.player_id
 		msg.to_node = 0
 		msg.brd=board
 		rospy.loginfo(msg)
-		pub.publish()
+		self.pub.publish(msg)
 				
-	def callback(self):
+	def callback(self, data):
 		rospy.loginfo((data.from_node, data.to_node))
 		if data.to_node == self.player_id:
 			board = data.brd
@@ -31,11 +31,9 @@ class Player:
 			self.talker(board)
 
 	def listener(self):
-		#rospy.init_node('player', anonymous=True)
-		rospy.Subscriber("tic_tac_toe", game, self.callback)
-		rospy.spin()
+            pass
 		
-#place marker on board
+
 	def place_marker(self,board,position):
 		board[position] = self.marker
 		
