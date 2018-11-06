@@ -22,12 +22,13 @@ class Player:
 		rospy.loginfo(msg)
 		pub.publish()
 				
-	def callback(self, data):
+	def callback(self):
 		rospy.loginfo((data.from_node, data.to_node))
 		if data.to_node == self.player_id:
 			board = data.brd
 			position=self.player_choice(board)
 			self.place_marker(board, position)
+			self.talker(board)
 
 	def listener(self):
 		#rospy.init_node('player', anonymous=True)

@@ -11,5 +11,3 @@ if __name__ == '__main__':
 	player2= Player(2, "O")
 	rospy.init_node('player2', anonymous=True)
 	player2.listener()
-	player2.talker()
-

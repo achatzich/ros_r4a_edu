@@ -48,14 +48,17 @@ class Board:
 		return True
 
 	def talker_beginning(self):
-		pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
+		self.pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
 		#rospy.init_node('orchestrator', anonymous=True)
 		msg = game()
 		msg.from_node = self.pub_node
 		msg.to_node = self.sub_node
 		msg.brd=self.board
 		rospy.loginfo(msg)
-		pub.publish(msg)
+		print('Player', self.sub_node, ' will go first.')
+		self.display_board()
+		self.pub.publish(msg)
+		print('kfjghdsjfg')
 
 	def callback(self,data):
 		rospy.loginfo((data.from_node, data.to_node))
@@ -64,6 +67,9 @@ class Board:
 			self.pub_node = data.from_node
 			self.sub_node = data.to_node
 			self.end_game()
+			if self.game_on:
+				self.diplay_board()
+				self.next_move()
 				
 	def next_move(self):
 		msg = game()
@@ -73,7 +79,7 @@ class Board:
 			msg.to_node = 2
 		else:
 			msg.to_node = 1
-		pub.publish(msg)
+		self.pub.publish(msg)
 		
 	def end_game(self):
 		if self.pub_node == 1:
@@ -95,9 +101,12 @@ class Board:
 
 	def listener(self):
 		#rospy.init_node('orchestrator', anonymous=True)
+		print("e")
 		rospy.Subscriber("tic_tac_toe", game, self.callback)
+		print("ea")
 		# spin() simply keeps python from exiting until this node is stopped
 		rospy.spin()
+		print("eb")
 		
 		
 		

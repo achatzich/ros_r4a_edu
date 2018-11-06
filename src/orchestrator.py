@@ -9,13 +9,16 @@ from class_board import Board
 
  		  	
 if __name__ == '__main__':
+	
 	theBoard=Board()
 	#pub = rospy.Publisher('tic_tac_toe', game, queue_size=10)
 	rospy.init_node('orchestrator', anonymous=True)
 	theBoard.talker_beginning()
-	while theBoard.game_on:
-		theBoard.listener()
-		theBoard.next_move()
-	rospy.is_shutdown()
-	sys.exit(0)
-		
+	print('dsfdsfg')
+	theBoard.listener()
+	print("esa")
+	if theBoard.game_on == False:
+		rospy.is_shutdown()
+		sys.exit(0)
+
+	
