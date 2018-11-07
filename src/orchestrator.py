@@ -9,6 +9,5 @@ from class_board import Board, BoardNode
 
  		  	
 if __name__ == '__main__':
-    brdNode = BoardNode("TicTacToeOrchestrator")
+    brdNode = BoardNode("orchestrator")
     brdNode.start()
-

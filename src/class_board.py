@@ -12,7 +12,6 @@ class BoardNode(object):
 	theBoard = Board()
         rospy.init_node('orchestrator', anonymous=True)
         self.rate = rospy.Rate(10) # 10hz
-        self.rate.sleep()
 	theBoard.start_game()
 
     def start(self):
@@ -20,47 +19,44 @@ class BoardNode(object):
         while not rospy.is_shutdown():
             self.rate.sleep()
 
+
 class Board:
  	def __init__(self):
- 		self.board = [' '] * 10
- 		self.game_on = True
- 		self.pub_node = 0
- 		self.sub_node = random.randint(1,2)
-		self.pub = rospy.Publisher('/tic_tac_toe', game, queue_size=100)
-                self.sub = rospy.Subscriber('/tic_tac_toe', game, self.callback)
+            self.board = [' '] * 10
+            self.game_on = True
+            self.pub_node = 0
+            self.sub_node = random.randint(1,2)
+            self.pub = rospy.Publisher('/tic_tac_toe', game, queue_size=10, latch=True)
+            self.sub = rospy.Subscriber('/tic_tac_toe', game, self.callback)
  		
 	def display_board(self):
-		print('   |   |')
-		print(' ' + self.board[7] + ' | ' + self.board[8] + ' | ' + self.board[9])
-		print('   |   |')
-		print('-----------')
-		print('   |   |')
-		print(' ' + self.board[4] + ' | ' + self.board[5] + ' | ' + self.board[6])
-		print('   |   |')
-		print('-----------')
-		print('   |   |')
-		print(' ' + self.board[1] + ' | ' + self.board[2] + ' | ' + self.board[3])
-		print('   |   |')
-		                                                                                                                                                       
+            print('\033[95m\r\nTicTacToe Board: \033[0m')
+            print('\033[92m-------------\033[0m')
+            print('\033[92m| \033[93m' + self.board[7] + '\033[92m | \033[93m' + self.board[8] + '\033[92m | \033[93m' + self.board[9] + '\033[92m |\033[0m')
+            print('\033[92m-------------\033[0m')
+            print('\033[92m| \033[93m' + self.board[4] + '\033[92m | \033[93m' + self.board[5] + '\033[92m | \033[93m' + self.board[6] + '\033[92m |\033[0m')
+            print('\033[92m-------------\033[0m')
+            print('\033[92m| \033[93m' + self.board[1] + '\033[92m | \033[93m' + self.board[2] + '\033[92m | \033[93m' + self.board[3] + '\033[92m |\033[0m')
+            print('\033[92m-------------\033[0m')
 		
 	def win_check (self,mark):
-		return ((self.board[7] == mark and self.board[8] == mark and self.board[9] == mark) or # across the top
-		(self.board[4] == mark and self.board[5] == mark and self.board[6] == mark) or # across the middle
-		(self.board[1] == mark and self.board[2] == mark and self.board[3] == mark) or # across the bottom
-		(self.board[7] == mark and self.board[4] == mark and self.board[1] == mark) or # down the middle
-		(self.board[8] == mark and self.board[5] == mark and self.board[2] == mark) or # down the middle
-		(self.board[9] == mark and self.board[6] == mark and self.board[3] == mark) or # down the right side
-		(self.board[7] == mark and self.board[5] == mark and self.board[3] == mark) or # diagonal
-		(self.board[9] == mark and self.board[5] == mark and self.board[1] == mark)) # diagonal
+            return ((self.board[7] == mark and self.board[8] == mark and self.board[9] == mark) or # across the top
+            (self.board[4] == mark and self.board[5] == mark and self.board[6] == mark) or # across the middle
+            (self.board[1] == mark and self.board[2] == mark and self.board[3] == mark) or # across the bottom
+            (self.board[7] == mark and self.board[4] == mark and self.board[1] == mark) or # down the middle
+            (self.board[8] == mark and self.board[5] == mark and self.board[2] == mark) or # down the middle
+            (self.board[9] == mark and self.board[6] == mark and self.board[3] == mark) or # down the right side
+            (self.board[7] == mark and self.board[5] == mark and self.board[3] == mark) or # diagonal
+            (self.board[9] == mark and self.board[5] == mark and self.board[1] == mark)) # diagonal
     
 	def check_space(self,position):
 		return self.board[position] == ' '
 		
 	def full_board_check (self):
-		for i in range (1,10):
-			if self.check_space(i):
-				return False
-		return True
+            for i in range (1,10):
+                if self.check_space(i):
+                    return False
+            return True
 
 	def start_game(self):
             self.msg = game()
@@ -71,9 +67,7 @@ class Board:
             self.display_board()
             self.pub.publish(self.msg)
 
-
 	def callback(self,data):
-            rospy.loginfo((data.from_node, data.to_node))
             if data.to_node == 0:
                 self.board = data.brd
                 self.pub_node = data.from_node
@@ -94,18 +88,18 @@ class Board:
             self.pub.publish(msg)
 		
 	def end_game(self):
-		if self.pub_node == 1:
-			if self.win_check('X'):
-				self.display_board()
-				print('Player 1 has won the game!')
-				self.game_on = False
-		else:
-			if self.win_check('O'):
-				self.display_board()
-				print('Player 2 has won the game!')
-				self.game_on = False
-			
-		if self.full_board_check():
-				self.display_board()
-				print('The game is a draw!')
-				self.game_on = False
+            if self.pub_node == 1:
+                if self.win_check('X'):
+                    self.display_board()
+                    print('Player 1 has won the game!')
+                    self.game_on = False
+            else:
+                if self.win_check('O'):
+                    self.display_board()
+                    print('Player 2 has won the game!')
+                    self.game_on = False
+                    
+            if self.full_board_check():
+                self.display_board()
+                print('The game is a draw!')
+                self.game_on = False
